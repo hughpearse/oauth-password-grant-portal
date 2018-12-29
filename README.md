@@ -16,3 +16,11 @@ foo@bar:~$ ./gradlew bootRun
 ```
 
 Then open http://localhost:8080/
+
+## Sample data
+```
+username: example@example.com
+password: password
+```
+Note to register an account you will need an active mail server to recieve the account activation email.
+
