@@ -1,0 +1,2 @@
+[(#{registration.user.create.email.activation.body})]
+[(${url})]

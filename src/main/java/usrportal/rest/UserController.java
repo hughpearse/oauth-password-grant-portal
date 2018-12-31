@@ -94,11 +94,11 @@ public class UserController {
     	Context context = new Context(locale);
     	context.setVariable("url", protocol+"://"+hostname+":"+port+"/user/activate?email="+emailAddress+"&token="+secretToken);
 		String emailMessage = appTemplateEngine.process("text/email-account-activation", context);
-    	emailService.sendMail(
-    			"registrationportal@example.com", 
-    			emailAddress,
-    			activationEmailSubject,
-    			emailMessage);
+		emailService.sendMimeMail(
+				"registrationportal@example.com", 
+				emailAddress,
+				activationEmailSubject,
+				emailMessage);
     	return new ResponseEntity<>("{\"message\":\""+successMsg+"\"}", HttpStatus.CREATED);
     }
 	

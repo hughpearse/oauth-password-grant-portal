@@ -22,5 +22,4 @@ Then open http://localhost:8080/
 username: example@example.com
 password: password
 ```
-Note to register an account you will need an active mail server to recieve the account activation email.
-
+Note to register an account you will need an active mail server to recieve the account activation email. I like to use [email-automation project](https://github.com/hughpearse/email-automation)
