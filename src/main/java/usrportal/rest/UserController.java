@@ -1,18 +1,15 @@
 package usrportal.rest;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +71,8 @@ public class UserController {
 
     List<User> user = repository.findByUsername(emailAddress);
     if (!user.isEmpty()) {
-      return new ResponseEntity<>("{\"message\":\"" + generalErrorMsg + "\"}", HttpStatus.CONFLICT);
+      return new ResponseEntity<>(Collections.singletonMap("message", generalErrorMsg),
+          HttpStatus.CONFLICT);
     }
     User newUser = new User();
     newUser.setUsername(emailAddress);
@@ -94,25 +92,24 @@ public class UserController {
     String emailMessage = appTemplateEngine.process("text/email-account-activation", context);
     emailService.sendMimeMail("registrationportal@example.com", emailAddress,
         activationEmailSubject, emailMessage);
-    return new ResponseEntity<>("{\"message\":\"" + successMsg + "\"}", HttpStatus.CREATED);
+
+    return new ResponseEntity<>(Collections.singletonMap("message", successMsg),
+        HttpStatus.CREATED);
   }
 
-  @RequestMapping("/query")
-  public ResponseEntity<?> createUser(@RequestParam(value = "email") String emailAddress) {
-    List<User> user = repository.findByUsername(emailAddress);
-    if (user.isEmpty()) {
-      return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-    }
-    return new ResponseEntity<>(user.get(0), HttpStatus.OK);
-  }
-
-  @RequestMapping("/activate")
+  @RequestMapping(value = "/activate", produces = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      method = RequestMethod.GET)
   public ResponseEntity<?> activateRegistration(@RequestParam(value = "email") String emailAddress,
       @RequestParam(value = "token") String token) {
+    Locale locale = LocaleContextHolder.getLocale();
+    String successMsg = i18n.getMessage(m.ACTIVATION_SUCCESS, null, locale);
+    String generalErrorMsg = i18n.getMessage(m.ACTIVATION_GENERAL_ERROR, null, locale);
+
     List<User> user = repository.findByUsername(emailAddress);
     if (user.isEmpty()) {
       log.info("UserController /activate empty resultset");
-      return new ResponseEntity<>("{\"message\":\"Activation Failed\"}", HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(Collections.singletonMap("message", generalErrorMsg),
+          HttpStatus.NOT_FOUND);
     }
     User updateUser = user.get(0);
     if (!updateUser.getRegActivationToken().equals(token)) {
@@ -120,26 +117,13 @@ public class UserController {
       log.info("UserController /activate updateUser.getRegActivationToken()={}",
           updateUser.getRegActivationToken());
       log.info("UserController /activate token={}", token);
-      return new ResponseEntity<>("{\"message\":\"Activation Failed\"}", HttpStatus.NOT_FOUND);
+      return new ResponseEntity<>(Collections.singletonMap("message", generalErrorMsg),
+          HttpStatus.NOT_FOUND);
     } else {
       log.info("UserController /activate?email={}&token={}", emailAddress, token);
       updateUser.setIsEnabled(true);
       repository.save(updateUser);
     }
-    return new ResponseEntity<>("{\"message\":\"Account activated\"}", HttpStatus.OK);
-  }
-
-  @RequestMapping("/list")
-  public ResponseEntity<?> listUsers(
-      @RequestParam(value = "page", required = false) Optional<Integer> pageOpt,
-      @RequestParam(value = "limit", required = false) Optional<Integer> limitOpt,
-      @RequestParam(value = "sort", required = false) Optional<String> sortOpt) {
-    log.info("processing /list");
-    Integer page = pageOpt.orElse(0);
-    Integer limit = limitOpt.orElse(10);
-    String sortStr = sortOpt.orElse("DESC");
-    Sort sort = new Sort(Sort.Direction.fromString(sortStr), new String[] {"id"});
-    Pageable pageable = PageRequest.of(page, limit, sort);
-    return new ResponseEntity<>(repository.findAll(pageable), HttpStatus.OK);
+    return new ResponseEntity<>(Collections.singletonMap("message", successMsg), HttpStatus.OK);
   }
 }

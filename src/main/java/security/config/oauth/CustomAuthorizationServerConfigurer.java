@@ -67,8 +67,7 @@ public class CustomAuthorizationServerConfigurer extends AuthorizationServerConf
    */
   @Override
   public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-    clients.inMemory().withClient(clientId).authorizedGrantTypes("password", "refresh_token")// local
-                                                                                             // oauth2
+    clients.inMemory().withClient(clientId).authorizedGrantTypes("password", "refresh_token")
         .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT").scopes("read", "write", "trust")
         .resourceIds("oauth2-resource").accessTokenValiditySeconds(accessTokenValiditySeconds)
         .secret(clientSecret);

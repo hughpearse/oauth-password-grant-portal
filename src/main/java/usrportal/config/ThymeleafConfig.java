@@ -81,7 +81,7 @@ public class ThymeleafConfig implements ApplicationContextAware, EnvironmentAwar
   private ITemplateResolver stringTemplateResolver() {
     final StringTemplateResolver resolver = new StringTemplateResolver();
     resolver.setOrder(Integer.valueOf(3));
-    resolver.setTemplateMode("HTML5");
+    resolver.setTemplateMode(TemplateMode.HTML);
     resolver.setCacheable(false);
     return resolver;
   }
