@@ -5,8 +5,7 @@ package usrportal.ui;
  *
  */
 public class Messages {
-    public final String TOP_BANNER_MESSAGE = "landingpage.top.banner";
-	
-	public Messages() {
-	}
+  public final String TOP_BANNER_MESSAGE = "landingpage.top.banner";
+
+  public Messages() {}
 }

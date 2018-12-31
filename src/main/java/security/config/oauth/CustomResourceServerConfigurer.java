@@ -7,7 +7,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 
 /**
  * Resource Server: provides identity information after authentication.
- *  
+ * 
  * @author hughpearse
  *
  */
@@ -15,14 +15,11 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 @EnableResourceServer
 public class CustomResourceServerConfigurer extends ResourceServerConfigurerAdapter {
 
-	@Override
-	public void configure(HttpSecurity http) throws Exception {
-		http.authorizeRequests()
-		    .antMatchers("/").permitAll()
-		    .antMatchers("/user/**").permitAll()
-		    .antMatchers("/register").permitAll()
-		    .antMatchers("/h2-console/**").permitAll()
-		    .antMatchers("/private/listusers").authenticated();
-	}
-	
+  @Override
+  public void configure(HttpSecurity http) throws Exception {
+    http.authorizeRequests().antMatchers("/").permitAll().antMatchers("/user/**").permitAll()
+        .antMatchers("/register").permitAll().antMatchers("/h2-console/**").permitAll()
+        .antMatchers("/private/listusers").authenticated();
+  }
+
 }

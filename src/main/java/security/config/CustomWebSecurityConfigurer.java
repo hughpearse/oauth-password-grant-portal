@@ -11,25 +11,22 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 @Configuration
-@EnableWebSecurity//( debug = true )
+@EnableWebSecurity // ( debug = true )
 @Order(1)
 public class CustomWebSecurityConfigurer extends WebSecurityConfigurerAdapter {
-	
-	@Autowired
-	UserDetailsService userDetailsService;
-    
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring()
-	        .antMatchers("/")
-	        .antMatchers("/user/**")
-	        .antMatchers("/register")
-	        .antMatchers("/h2-console/**");
-    }
-	
-	@Override
-	@Bean
-	public AuthenticationManager authenticationManagerBean() throws Exception {
-		return super.authenticationManagerBean();
-	}
+
+  @Autowired
+  UserDetailsService userDetailsService;
+
+  @Override
+  public void configure(WebSecurity web) throws Exception {
+    web.ignoring().antMatchers("/").antMatchers("/user/**").antMatchers("/register")
+        .antMatchers("/h2-console/**");
+  }
+
+  @Override
+  @Bean
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
 }
