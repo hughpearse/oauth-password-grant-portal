@@ -1,4 +1,4 @@
-package usrportal.utils;
+package usrportal.email;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;

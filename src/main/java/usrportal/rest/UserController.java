@@ -2,12 +2,15 @@ package usrportal.rest;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -19,15 +22,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import usrportal.email.EmailService;
 import usrportal.repo.User;
 import usrportal.repo.UserRepository;
-import usrportal.utils.EmailService;
 import usrportal.utils.TokenUtils;
 
 @RestController
 @RequestMapping("/user")
 public class UserController {
+	
+	@Value("${protocol}")
+	private String protocol;
 	
 	@Value("${system.hostname}")
 	private String hostname;
@@ -44,7 +52,15 @@ public class UserController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+	private MessageSource i18n;
+	
+	Messages m = new Messages();
+	
 	TokenUtils tokenUtils = new TokenUtils();
+	
+	@Autowired
+	TemplateEngine appTemplateEngine;
 	
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 	
@@ -54,9 +70,14 @@ public class UserController {
     		@RequestParam(value="password") String password
     		){
 		log.info("UserController /create?email={}&password={}", emailAddress, password);
+		Locale locale = LocaleContextHolder.getLocale();
+		String successMsg = i18n.getMessage(m.REGISTRATION_SUCCESS, null, locale);
+		String generalErrorMsg = i18n.getMessage(m.REGISTRATION_GENERAL_ERROR, null, locale);
+		String activationEmailSubject = i18n.getMessage(m.ACTIVATION_EMAIL_SUBJECT, null, locale);
+		
     	List<User> user = repository.findByUsername(emailAddress);
     	if(!user.isEmpty()) {
-    		return new ResponseEntity<>("{\"message\":\"Registration failed\"}", HttpStatus.CONFLICT);
+    		return new ResponseEntity<>("{\"message\":\""+generalErrorMsg+"\"}", HttpStatus.CONFLICT);
     	}
     	User newUser = new User();
     	newUser.setUsername(emailAddress);
@@ -69,8 +90,16 @@ public class UserController {
     	newUser.setRegActivationToken(secretToken);
     	newUser.setRoles(Arrays.asList("USER"));
     	repository.save(newUser);
-    	emailService.sendMail("registrationportal@example.com", emailAddress,"Registration","http://"+hostname+":"+port+"/user/activate?email="+emailAddress+"&token="+secretToken);
-    	return new ResponseEntity<>("{\"message\":\"Registration success, please check your email to activate your account.\"}", HttpStatus.CREATED);
+    	
+    	Context context = new Context(locale);
+    	context.setVariable("url", protocol+"://"+hostname+":"+port+"/user/activate?email="+emailAddress+"&token="+secretToken);
+		String emailMessage = appTemplateEngine.process("text/email-account-activation", context);
+    	emailService.sendMail(
+    			"registrationportal@example.com", 
+    			emailAddress,
+    			activationEmailSubject,
+    			emailMessage);
+    	return new ResponseEntity<>("{\"message\":\""+successMsg+"\"}", HttpStatus.CREATED);
     }
 	
 	@RequestMapping("/query")

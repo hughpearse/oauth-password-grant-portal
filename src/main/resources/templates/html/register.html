@@ -5,7 +5,7 @@
       <title>Spring Boot Application</title>
    </head>
    <body>
-      <h1>Registration page</h1>
+      <h1><span th:text="#{registrationpage.top.banner}"></h1>
       <form action="/user/create" method="post">
           <p>Email: <input type="text" name="email" /></p>
           <p>Password: <input type="text" name="password" /></p>

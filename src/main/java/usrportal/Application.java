@@ -13,8 +13,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 		"security.config",
 		"security.config.oauth",
 		"usrportal",
+		"usrportal.config",
+		"usrportal.email",
 		"usrportal.repo",
-		"usrportal.rest"})
+		"usrportal.rest",
+		"usrportal.ui",
+		"usrportal.utils"})
 @EnableJpaRepositories
 public class Application {
     public static void main(String[] args) {
