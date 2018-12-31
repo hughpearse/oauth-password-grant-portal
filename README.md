@@ -1,5 +1,5 @@
 # OAuth2 password grant user registration portal
-Basic OAuth2 password grant user registration and login portal.
+Basic OAuth2 password grant user registration and login portal. It also supports i18n language internationalisation and emails users automatically for account activation.
 
 Build the workspace:
 ## Compile:
